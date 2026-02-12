@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endurance Racing Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Video Background for Racing Footage -->
+    <video id="racingVideo" class="video-background" autoplay muted loop playsinline>
+        <source src="/static/racing-background.mp4" type="video/mp4">
+        <source src="/static/racing-background.webm" type="video/webm">
+    </video>
+
+    <!-- 3D Racing Scene Background (Fallback) -->
+    <div class="racing-scene">
+        <div class="racing-car-1">🏎️</div>
+        <div class="racing-car-2">🏎️</div>
+    </div>
+    <div class="speed-lines"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="icon">🏁</span>
+                    Endurance Racing Tracker
+                </h1>
+                <div class="race-info" id="raceInfo">
+                    <span id="raceName">Loading...</span>
+                    <span class="separator">•</span>
+                    <span id="raceTime">--:--</span>
+                    <span class="live-indicator">
+                        <span class="pulse"></span>
+                        LIVE
+                    </span>
+                </div>
+            </div>
+
+            <!-- Class Filter -->
+            <div class="class-filter">
+                <button class="filter-btn active" data-class="all">All Classes</button>
+                <button class="filter-btn" data-class="Hypercar">Hypercar</button>
+                <button class="filter-btn" data-class="LMP2">LMP2</button>
+                <button class="filter-btn" data-class="LMGT3">LMGT3</button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Leaderboard -->
+            <section class="panel leaderboard-panel">
+                <div class="panel-header">
+                    <h2>Live Leaderboard</h2>
+                    <span class="update-time" id="lastUpdate">Updated: --:--</span>
+                </div>
+                <div class="leaderboard" id="leaderboard">
+                    <div class="loading">Loading leaderboard...</div>
+                </div>
+            </section>
+
+            <!-- Lap Times Chart -->
+            <section class="panel chart-panel">
+                <div class="panel-header">
+                    <h2>Lap Time Analysis</h2>
+                    <select id="carSelect" class="car-select">
+                        <option value="">Select a car...</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lapTimeChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Telemetry -->
+            <section class="panel telemetry-panel">
+                <div class="panel-header">
+                    <h2>Telemetry</h2>
+                </div>
+                <div class="telemetry-grid" id="telemetry">
+                    <div class="telemetry-card">
+                        <div class="telemetry-label">Last Lap</div>
+                        <div class="telemetry-value" id="lastLap">--:--</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div class="telemetry-label">Best Lap</div>
+                        <div class="telemetry-value" id="bestLap">--:--</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div class="telemetry-label">Predicted</div>
+                        <div class="telemetry-value" id="predicted">--:--</div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div class="telemetry-label">Delta</div>
+                        <div class="telemetry-value" id="delta">--</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Strategy -->
+            <section class="panel strategy-panel">
+                <div class="panel-header">
+                    <h2>Pit Strategy</h2>
+                </div>
+                <div class="strategy-content" id="strategy">
+                    <div class="strategy-empty">Select a car to view strategy</div>
+                </div>
+            </section>
+
+            <!-- Anomalies -->
+            <section class="panel anomalies-panel">
+                <div class="panel-header">
+                    <h2>Recent Incidents</h2>
+                </div>
+                <div class="anomalies-list" id="anomalies">
+                    <div class="loading">Loading incidents...</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

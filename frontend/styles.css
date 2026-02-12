@@ -1,0 +1,701 @@
+/* Modern Dark Theme for Endurance Racing Tracker */
+
+:root {
+    /* Color Palette */
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #131827;
+    --bg-tertiary: #1a1f35;
+    --accent-primary: #00d4ff;
+    --accent-secondary: #ff3366;
+    --accent-success: #00ff88;
+    --accent-warning: #ffaa00;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --text-muted: #718096;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    perspective: 1000px;
+}
+
+/* Video Background Styling */
+.video-background {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    object-fit: cover;
+    opacity: 0.4;
+    filter: brightness(0.7) contrast(1.1) saturate(1.2);
+}
+
+/* Cinematic overlay for video */
+.video-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg,
+            rgba(10, 14, 26, 0.6) 0%,
+            rgba(10, 14, 26, 0.4) 50%,
+            rgba(10, 14, 26, 0.8) 100%);
+    pointer-events: none;
+}
+
+/* 3D Racing Track Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(180deg, transparent 0%, rgba(10, 14, 26, 0.3) 50%, rgba(10, 14, 26, 0.8) 100%),
+        repeating-linear-gradient(90deg,
+            transparent,
+            transparent 48%,
+            rgba(0, 212, 255, 0.1) 48%,
+            rgba(0, 212, 255, 0.1) 52%,
+            transparent 52%);
+    background-size: 100% 100%, 200px 100%;
+    animation: trackScroll 3s linear infinite;
+    transform: rotateX(60deg) translateZ(-500px);
+    transform-origin: center bottom;
+    z-index: 0;
+    opacity: 0.3;
+}
+
+/* Cinematic Main Racing Car */
+body::after {
+    content: '🏎️';
+    position: fixed;
+    font-size: 80px;
+    bottom: 30%;
+    left: -150px;
+    opacity: 0.25;
+    animation: car3D 12s ease-in-out infinite;
+    z-index: 0;
+    filter:
+        drop-shadow(0 0 30px rgba(0, 212, 255, 0.8)) drop-shadow(0 10px 40px rgba(0, 0, 0, 0.6)) blur(0.5px);
+    transform-style: preserve-3d;
+}
+
+/* Racing Scene Container */
+.racing-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.racing-car-1 {
+    position: absolute;
+    font-size: 60px;
+    bottom: 45%;
+    left: -100px;
+    opacity: 0.2;
+    animation: car3D-far 18s ease-in-out infinite 2s;
+    filter:
+        drop-shadow(0 0 20px rgba(255, 51, 102, 0.6)) blur(1px);
+}
+
+.racing-car-2 {
+    position: absolute;
+    font-size: 50px;
+    bottom: 55%;
+    left: -80px;
+    opacity: 0.15;
+    animation: car3D-far 20s ease-in-out infinite 5s;
+    filter:
+        drop-shadow(0 0 15px rgba(0, 255, 136, 0.5)) blur(1.5px);
+}
+
+/* Speed Lines Effect */
+.speed-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(90deg,
+            transparent,
+            transparent 95%,
+            rgba(0, 212, 255, 0.05) 95%,
+            rgba(0, 212, 255, 0.05) 100%);
+    background-size: 100px 100%;
+    animation: speedLines 1.5s linear infinite;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+/* Track Scroll Animation */
+@keyframes trackScroll {
+    0% {
+        background-position: 0 0, 0 0;
+    }
+
+    100% {
+        background-position: 0 0, 200px 0;
+    }
+}
+
+/* 3D Car Animation - Main */
+@keyframes car3D {
+    0% {
+        left: -150px;
+        bottom: 30%;
+        transform: translateZ(0) rotateY(-5deg) scale(1);
+        filter:
+            drop-shadow(0 0 30px rgba(0, 212, 255, 0.8)) drop-shadow(0 10px 40px rgba(0, 0, 0, 0.6)) blur(0.5px);
+    }
+
+    25% {
+        transform: translateZ(100px) rotateY(0deg) scale(1.15);
+        filter:
+            drop-shadow(0 0 40px rgba(0, 212, 255, 1)) drop-shadow(0 15px 50px rgba(0, 0, 0, 0.8)) blur(0px);
+    }
+
+    50% {
+        bottom: 35%;
+        transform: translateZ(150px) rotateY(2deg) scale(1.2);
+    }
+
+    75% {
+        transform: translateZ(100px) rotateY(0deg) scale(1.15);
+        filter:
+            drop-shadow(0 0 40px rgba(0, 212, 255, 1)) drop-shadow(0 15px 50px rgba(0, 0, 0, 0.8)) blur(0px);
+    }
+
+    100% {
+        left: calc(100% + 150px);
+        bottom: 30%;
+        transform: translateZ(0) rotateY(5deg) scale(1);
+        filter:
+            drop-shadow(0 0 30px rgba(0, 212, 255, 0.8)) drop-shadow(0 10px 40px rgba(0, 0, 0, 0.6)) blur(0.5px);
+    }
+}
+
+/* 3D Car Animation - Far Cars */
+@keyframes car3D-far {
+    0% {
+        left: -100px;
+        transform: translateZ(-100px) scale(0.8);
+        opacity: 0.15;
+    }
+
+    50% {
+        transform: translateZ(-80px) scale(0.85);
+        opacity: 0.2;
+    }
+
+    100% {
+        left: calc(100% + 100px);
+        transform: translateZ(-100px) scale(0.8);
+        opacity: 0.15;
+    }
+}
+
+/* Speed Lines Animation */
+@keyframes speedLines {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: -100px 0;
+    }
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
+.header {
+    background: rgba(19, 24, 39, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon {
+    font-size: 36px;
+    filter: drop-shadow(0 0 10px var(--accent-primary));
+}
+
+.race-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.separator {
+    color: var(--text-muted);
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-success);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-success);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+/* Class Filter */
+.class-filter {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-color: transparent;
+    color: var(--text-primary);
+    box-shadow: var(--glow);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+}
+
+.panel {
+    background: rgba(19, 24, 39, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.panel-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.update-time {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Leaderboard */
+.leaderboard-panel {
+    grid-column: span 6;
+}
+
+.leaderboard {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 50px 80px 1fr 100px 100px 100px;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-primary);
+    cursor: pointer;
+}
+
+.position {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--accent-primary);
+}
+
+.car-number {
+    font-size: 18px;
+    font-weight: 700;
+    padding: 4px 8px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 6px;
+    text-align: center;
+}
+
+.team-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.team-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.car-class {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.lap-time {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.gap {
+    font-size: 13px;
+    color: var(--accent-warning);
+    text-align: right;
+}
+
+.in-pit {
+    background: rgba(255, 170, 0, 0.2);
+    border-color: var(--accent-warning);
+}
+
+/* Chart Panel */
+.chart-panel {
+    grid-column: span 6;
+}
+
+.car-select {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.car-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+.car-select:focus {
+    border-color: var(--accent-primary);
+}
+
+.chart-container {
+    height: 400px;
+    position: relative;
+}
+
+/* Telemetry */
+.telemetry-panel {
+    grid-column: span 4;
+}
+
+.telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.telemetry-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.telemetry-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.05);
+}
+
+.telemetry-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.telemetry-value {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--accent-primary);
+}
+
+/* Strategy */
+.strategy-panel {
+    grid-column: span 4;
+}
+
+.strategy-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.strategy-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+}
+
+.strategy-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.strategy-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.strategy-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent-success);
+}
+
+.strategy-reasoning {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Anomalies */
+.anomalies-panel {
+    grid-column: span 4;
+}
+
+.anomalies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.anomaly-item {
+    background: rgba(255, 51, 102, 0.1);
+    border: 1px solid var(--accent-secondary);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.anomaly-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.anomaly-car {
+    font-weight: 700;
+    color: var(--accent-secondary);
+}
+
+.anomaly-type {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.anomaly-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+    font-size: 14px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-secondary);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+
+    .leaderboard-panel,
+    .chart-panel {
+        grid-column: span 12;
+    }
+
+    .telemetry-panel,
+    .strategy-panel,
+    .anomalies-panel {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .telemetry-panel,
+    .strategy-panel,
+    .anomalies-panel {
+        grid-column: span 12;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .leaderboard-row {
+        grid-template-columns: 40px 60px 1fr;
+        font-size: 12px;
+    }
+
+    .lap-time,
+    .gap {
+        display: none;
+    }
+}

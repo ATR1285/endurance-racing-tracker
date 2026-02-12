@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  racing-tracker:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    environment:
+      - DATABASE_URL=sqlite:///./data/racing.db
+      - SCRAPE_INTERVAL=10
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    restart: unless-stopped
