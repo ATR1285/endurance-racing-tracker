@@ -222,10 +222,12 @@ class TrackMapVisualizer {
         const dy = next[1] - curr[1];
         const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
 
-        // Convert to screen coordinates (percentage)
+        // FIXED: Convert to screen coordinates accounting for viewBox offset
         const bounds = this.calculateBounds(points);
-        const screenX = ((x - bounds.minX) / bounds.width) * 100;
-        const screenY = ((y - bounds.minY) / bounds.height) * 100;
+        // The viewBox is: minX-50, minY-50, width+100, height+100
+        // So we need to account for the -50 offset
+        const screenX = ((x - (bounds.minX - 50)) / (bounds.width + 100)) * 100;
+        const screenY = ((y - (bounds.minY - 50)) / (bounds.height + 100)) * 100;
 
         return { x, y, screenX, screenY, rotation };
     }
