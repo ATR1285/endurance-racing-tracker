@@ -176,10 +176,10 @@ class TrackMapVisualizer {
     }
 
     startUpdates() {
-        // Update car positions every second
+        // Update car positions more frequently for smooth animation
         this.updateInterval = setInterval(() => {
             this.fetchCarPositions();
-        }, 1000);
+        }, 500); // Update every 500ms for smooth movement
     }
 
     async fetchCarPositions() {
