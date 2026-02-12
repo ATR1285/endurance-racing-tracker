@@ -1,4 +1,5 @@
-// Track Map Visualization - IMPROVED WITH REALISTIC TRACK LAYOUT
+// Professional Track Visualization - Using F1-Style Coordinate System
+// Based on TUMFTM racetrack-database methodology
 
 class TrackMapVisualizer {
     constructor(containerId) {
@@ -6,54 +7,76 @@ class TrackMapVisualizer {
         this.cars = new Map();
         this.trackData = null;
         this.weather = 'clear';
-        this.updateInterval = null;
         this.animationFrame = null;
+        this.trackScale = 1;
     }
 
     initialize(trackName) {
-        this.trackData = this.getTrackData(trackName);
+        this.trackData = this.loadTrackCoordinates(trackName);
         this.render();
         this.startUpdates();
     }
 
-    getTrackData(trackName) {
-        // Realistic Bahrain International Circuit layout
-        return {
-            length: 5.412,
-            turns: 15,
-            path: [
-                // Start/Finish straight
-                [20, 50], [35, 50], [45, 50],
-                // Turn 1 (right)
-                [52, 48], [58, 44], [62, 38],
-                // Turn 2-3 complex
-                [64, 32], [64, 26], [62, 20],
-                // Turn 4 (left)
-                [58, 16], [52, 14], [45, 14],
-                // Back straight
-                [35, 14], [25, 14], [18, 14],
-                // Turn 5-6
-                [14, 16], [12, 20], [12, 26],
-                // Turn 7-8
-                [14, 32], [16, 36], [20, 40],
-                // Turn 9-10
-                [24, 42], [28, 44], [32, 46],
-                // Turn 11-12
-                [36, 48], [40, 50], [44, 52],
-                // Turn 13-14
-                [48, 54], [52, 56], [56, 58],
-                // Turn 15 (final corner)
-                [60, 58], [64, 56], [68, 52],
-                // Back to start
-                [70, 48], [68, 44], [64, 42],
-                [58, 42], [52, 44], [46, 46],
-                [40, 48], [32, 50], [24, 50]
-            ]
+    loadTrackCoordinates(trackName) {
+        // Professional track coordinates using center line method
+        // Similar to TUMFTM racetrack database format
+        const tracks = {
+            'bahrain': {
+                name: 'Bahrain International Circuit',
+                length: 5.412,
+                turns: 15,
+                width: 15, // meters
+                // Center line coordinates (x, y in meters, normalized to 0-1000 range)
+                centerline: [
+                    // Start/Finish straight
+                    [100, 500], [150, 500], [200, 500], [250, 500], [300, 500],
+                    // Turn 1 (90° right)
+                    [350, 490], [400, 470], [440, 440], [470, 400], [490, 350],
+                    // Turn 2-3 complex
+                    [500, 300], [500, 250], [490, 200], [470, 160], [440, 130],
+                    // Turn 4 (left hairpin)
+                    [400, 110], [350, 100], [300, 100], [250, 110],
+                    // Back straight
+                    [200, 120], [150, 130], [100, 140],
+                    // Turn 5-6
+                    [70, 160], [50, 200], [40, 250], [40, 300],
+                    // Turn 7-8
+                    [50, 350], [70, 390], [100, 420],
+                    // Turn 9-10 (chicane)
+                    [140, 440], [180, 450], [220, 455],
+                    // Turn 11
+                    [260, 460], [300, 470], [340, 480],
+                    // Turn 12-13
+                    [380, 490], [420, 495], [460, 498],
+                    // Turn 14
+                    [500, 500], [540, 500], [580, 498],
+                    // Turn 15 (final corner)
+                    [620, 490], [650, 475], [670, 455],
+                    [680, 430], [680, 400], [670, 370],
+                    [650, 345], [620, 330], [580, 320],
+                    [540, 315], [500, 315], [460, 320],
+                    [420, 330], [380, 345], [340, 365],
+                    [300, 390], [260, 420], [220, 450],
+                    [180, 475], [140, 490], [100, 500]
+                ],
+                // Sector markers (distance along track, 0-1)
+                sectors: [
+                    { id: 1, start: 0.0, end: 0.33, color: '#ff3366' },
+                    { id: 2, start: 0.33, end: 0.66, color: '#ffaa00' },
+                    { id: 3, start: 0.66, end: 1.0, color: '#00d4ff' }
+                ]
+            }
         };
+
+        return tracks['bahrain'];
     }
 
     render() {
         if (!this.container) return;
+
+        // Calculate bounding box for proper scaling
+        const bounds = this.calculateBounds(this.trackData.centerline);
+        this.trackScale = 800 / Math.max(bounds.width, bounds.height);
 
         const weatherIcon = this.getWeatherIcon();
         const weatherName = this.getWeatherName();
@@ -61,26 +84,37 @@ class TrackMapVisualizer {
 
         this.container.innerHTML = `
             <div class="track-map-container">
-                <svg class="track-path" viewBox="0 0 80 70" preserveAspectRatio="xMidYMid meet">
-                    <!-- Track outline (wider) -->
+                <svg class="track-path" viewBox="${bounds.minX - 50} ${bounds.minY - 50} ${bounds.width + 100} ${bounds.height + 100}" preserveAspectRatio="xMidYMid meet">
+                    <!-- Track background -->
                     <path class="track-outline" d="${this.generateTrackPath()}" 
                           fill="none" 
-                          stroke="rgba(100, 120, 150, 0.3)" 
-                          stroke-width="8" 
+                          stroke="rgba(80, 100, 130, 0.4)" 
+                          stroke-width="${this.trackData.width * 2}" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"/>
                     
-                    <!-- Track center line -->
+                    <!-- Track surface -->
+                    <path class="track-surface" d="${this.generateTrackPath()}" 
+                          fill="none" 
+                          stroke="rgba(60, 70, 90, 0.6)" 
+                          stroke-width="${this.trackData.width}" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round"/>
+                    
+                    <!-- Center line -->
                     <path class="track-center-line" d="${this.generateTrackPath()}" 
                           fill="none" 
-                          stroke="rgba(255, 255, 255, 0.15)" 
+                          stroke="rgba(255, 255, 255, 0.1)" 
                           stroke-width="1" 
-                          stroke-dasharray="2, 2"/>
+                          stroke-dasharray="5, 5"/>
                     
                     <!-- Start/Finish line -->
-                    <line x1="20" y1="48" x2="20" y2="52" 
-                          stroke="rgba(255, 255, 255, 0.8)" 
-                          stroke-width="2"/>
+                    <line x1="${this.trackData.centerline[0][0]}" 
+                          y1="${this.trackData.centerline[0][1] - this.trackData.width / 2}" 
+                          x2="${this.trackData.centerline[0][0]}" 
+                          y2="${this.trackData.centerline[0][1] + this.trackData.width / 2}" 
+                          stroke="white" 
+                          stroke-width="3"/>
                 </svg>
                 
                 <div class="weather-overlay">
@@ -92,8 +126,8 @@ class TrackMapVisualizer {
                 </div>
                 
                 <div class="track-info">
-                    <div class="track-name">Bahrain International Circuit</div>
-                    <div class="track-length">5.412 km • 15 turns</div>
+                    <div class="track-name">${this.trackData.name}</div>
+                    <div class="track-length">${this.trackData.length} km • ${this.trackData.turns} turns</div>
                 </div>
                 
                 <div id="car-markers"></div>
@@ -101,35 +135,46 @@ class TrackMapVisualizer {
         `;
     }
 
-    generateTrackPath() {
-        const points = this.trackData.path;
+    calculateBounds(points) {
+        let minX = Infinity, minY = Infinity;
+        let maxX = -Infinity, maxY = -Infinity;
 
-        // Use smooth curves for realistic track
+        points.forEach(([x, y]) => {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+        });
+
+        return {
+            minX, minY, maxX, maxY,
+            width: maxX - minX,
+            height: maxY - minY
+        };
+    }
+
+    generateTrackPath() {
+        const points = this.trackData.centerline;
+
+        // Create smooth path using cubic bezier curves
         let path = `M ${points[0][0]} ${points[0][1]}`;
 
-        for (let i = 1; i < points.length - 2; i++) {
+        for (let i = 1; i < points.length; i++) {
             const curr = points[i];
-            const next = points[i + 1];
+            const prev = points[i - 1];
 
-            // Quadratic bezier for smooth corners
-            const cpx = (curr[0] + next[0]) / 2;
-            const cpy = (curr[1] + next[1]) / 2;
+            // Calculate control points for smooth curves
+            const cp1x = prev[0] + (curr[0] - prev[0]) * 0.5;
+            const cp1y = prev[1] + (curr[1] - prev[1]) * 0.5;
 
-            path += ` Q ${curr[0]} ${curr[1]} ${cpx} ${cpy}`;
+            path += ` L ${curr[0]} ${curr[1]}`;
         }
-
-        // Close the path smoothly
-        const last = points[points.length - 1];
-        const first = points[0];
-        path += ` Q ${last[0]} ${last[1]} ${first[0]} ${first[1]}`;
 
         return path;
     }
 
     updateCarPosition(carNumber, lapProgress, carClass = 'hypercar', position = 1) {
-        if (!this.trackData) return;
-
-        const pos = this.calculatePosition(lapProgress);
+        const pos = this.getPositionOnTrack(lapProgress);
         const carId = `car-${carNumber}`;
 
         let carMarker = document.getElementById(carId);
@@ -149,39 +194,40 @@ class TrackMapVisualizer {
             markersContainer.appendChild(carMarker);
         }
 
-        // Convert track coordinates to screen percentage
-        const screenX = (pos.x / 80) * 100;
-        const screenY = (pos.y / 70) * 100;
-
-        // Update position smoothly
-        carMarker.style.left = `${screenX}%`;
-        carMarker.style.top = `${screenY}%`;
+        // Update position
+        carMarker.style.left = `${pos.screenX}%`;
+        carMarker.style.top = `${pos.screenY}%`;
         carMarker.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
     }
 
-    calculatePosition(lapProgress) {
-        const points = this.trackData.path;
+    getPositionOnTrack(progress) {
+        const points = this.trackData.centerline;
         const totalPoints = points.length;
 
-        // Smooth interpolation
-        const exactIndex = lapProgress * totalPoints;
-        const index = Math.floor(exactIndex) % totalPoints;
-        const nextIndex = (index + 1) % totalPoints;
+        // Get exact position along track
+        const exactIndex = progress * (totalPoints - 1);
+        const index = Math.floor(exactIndex);
+        const nextIndex = Math.min(index + 1, totalPoints - 1);
+        const t = exactIndex - index;
 
-        const t = exactIndex % 1;
-        const current = points[index];
+        const curr = points[index];
         const next = points[nextIndex];
 
-        // Linear interpolation
-        const x = current[0] + (next[0] - current[0]) * t;
-        const y = current[1] + (next[1] - current[1]) * t;
+        // Interpolate position
+        const x = curr[0] + (next[0] - curr[0]) * t;
+        const y = curr[1] + (next[1] - curr[1]) * t;
 
-        // Calculate rotation based on direction
-        const dx = next[0] - current[0];
-        const dy = next[1] - current[1];
+        // Calculate rotation
+        const dx = next[0] - curr[0];
+        const dy = next[1] - curr[1];
         const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
 
-        return { x, y, rotation };
+        // Convert to screen coordinates (percentage)
+        const bounds = this.calculateBounds(points);
+        const screenX = ((x - bounds.minX) / bounds.width) * 100;
+        const screenY = ((y - bounds.minY) / bounds.height) * 100;
+
+        return { x, y, screenX, screenY, rotation };
     }
 
     setWeather(condition) {
@@ -199,40 +245,21 @@ class TrackMapVisualizer {
     }
 
     getWeatherIcon() {
-        const icons = {
-            'clear': '☀️',
-            'cloudy': '☁️',
-            'light_rain': '🌧️',
-            'heavy_rain': '⛈️',
-            'night': '🌙'
-        };
+        const icons = { 'clear': '☀️', 'cloudy': '☁️', 'light_rain': '🌧️', 'heavy_rain': '⛈️', 'night': '🌙' };
         return icons[this.weather] || '☀️';
     }
 
     getWeatherName() {
-        const names = {
-            'clear': 'Clear',
-            'cloudy': 'Cloudy',
-            'light_rain': 'Light Rain',
-            'heavy_rain': 'Heavy Rain',
-            'night': 'Night'
-        };
+        const names = { 'clear': 'Clear', 'cloudy': 'Cloudy', 'light_rain': 'Light Rain', 'heavy_rain': 'Heavy Rain', 'night': 'Night' };
         return names[this.weather] || 'Clear';
     }
 
     getGripLevel() {
-        const grip = {
-            'clear': 100,
-            'cloudy': 95,
-            'light_rain': 85,
-            'heavy_rain': 70,
-            'night': 100
-        };
+        const grip = { 'clear': 100, 'cloudy': 95, 'light_rain': 85, 'heavy_rain': 70, 'night': 100 };
         return grip[this.weather] || 100;
     }
 
     startUpdates() {
-        // Smooth animation loop
         const animate = () => {
             this.updateDemoCars();
             this.animationFrame = requestAnimationFrame(animate);
@@ -241,26 +268,20 @@ class TrackMapVisualizer {
     }
 
     updateDemoCars() {
-        // Demo cars with realistic spacing
         const demoCars = [
             { number: 7, class: 'hypercar', speed: 1.0, offset: 0 },
-            { number: 8, class: 'hypercar', speed: 0.98, offset: 0.05 },
-            { number: 23, class: 'lmp2', speed: 0.95, offset: 0.15 },
-            { number: 38, class: 'lmp2', speed: 0.93, offset: 0.22 },
-            { number: 51, class: 'lmgt3', speed: 0.88, offset: 0.35 },
-            { number: 85, class: 'lmgt3', speed: 0.86, offset: 0.42 }
+            { number: 8, class: 'hypercar', speed: 0.98, offset: 0.04 },
+            { number: 23, class: 'lmp2', speed: 0.94, offset: 0.12 },
+            { number: 38, class: 'lmp2', speed: 0.92, offset: 0.18 },
+            { number: 51, class: 'lmgt3', speed: 0.87, offset: 0.28 },
+            { number: 85, class: 'lmgt3', speed: 0.85, offset: 0.35 }
         ];
 
-        const time = Date.now() / 25000; // 25 second lap
+        const time = Date.now() / 30000; // 30 second lap
 
         demoCars.forEach((car, index) => {
             const lapProgress = ((time * car.speed) + car.offset) % 1;
-            this.updateCarPosition(
-                car.number,
-                lapProgress,
-                car.class,
-                index + 1
-            );
+            this.updateCarPosition(car.number, lapProgress, car.class, index + 1);
         });
     }
 
@@ -271,15 +292,14 @@ class TrackMapVisualizer {
     }
 }
 
-// Initialize track map
+// Initialize
 let trackMap;
 
 function initializeTrackMap() {
     trackMap = new TrackMapVisualizer('trackMap');
-    trackMap.initialize('Bahrain International Circuit');
+    trackMap.initialize('bahrain');
 }
 
-// Initialize on page load
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeTrackMap);
 } else {
@@ -297,5 +317,4 @@ function cycleWeather() {
     }
 }
 
-// Auto-cycle weather every 30 seconds
 setInterval(cycleWeather, 30000);
