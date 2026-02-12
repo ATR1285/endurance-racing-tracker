@@ -1,4 +1,4 @@
-// Track Map Visualization with Moving Cars
+// Track Map Visualization with Moving Cars - FIXED VERSION
 
 class TrackMapVisualizer {
     constructor(containerId) {
@@ -7,6 +7,7 @@ class TrackMapVisualizer {
         this.trackData = null;
         this.weather = 'clear';
         this.updateInterval = null;
+        this.animationFrame = null;
     }
 
     initialize(trackName) {
@@ -16,31 +17,23 @@ class TrackMapVisualizer {
     }
 
     getTrackData(trackName) {
-        // Track coordinates (simplified)
-        const tracks = {
-            'Bahrain International Circuit': {
-                length: 5.412,
-                turns: 15,
-                path: [
-                    [50, 50], [70, 50], [75, 45], [80, 35], [75, 25],
-                    [60, 20], [40, 20], [30, 25], [25, 35], [30, 45], [40, 50]
-                ]
-            },
-            'Circuit de la Sarthe': {
-                length: 13.626,
-                turns: 38,
-                path: [
-                    [20, 50], [80, 50], [85, 45], [85, 30], [80, 20],
-                    [60, 15], [40, 20], [25, 30], [20, 40]
-                ]
-            }
+        // Simplified track paths
+        return {
+            length: 5.412,
+            turns: 15,
+            path: [
+                [50, 50], [70, 50], [75, 45], [80, 35], [75, 25],
+                [60, 20], [40, 20], [30, 25], [25, 35], [30, 45], [40, 50]
+            ]
         };
-
-        return tracks[trackName] || tracks['Bahrain International Circuit'];
     }
 
     render() {
         if (!this.container) return;
+
+        const weatherIcon = this.getWeatherIcon();
+        const weatherName = this.getWeatherName();
+        const gripLevel = this.getGripLevel();
 
         this.container.innerHTML = `
             <div class="track-map-container">
@@ -50,16 +43,16 @@ class TrackMapVisualizer {
                 </svg>
                 
                 <div class="weather-overlay">
-                    <div class="weather-icon">${this.getWeatherIcon()}</div>
+                    <div class="weather-icon">${weatherIcon}</div>
                     <div class="weather-info">
-                        <div class="weather-condition">${this.getWeatherName()}</div>
-                        <div class="weather-details">Grip: ${this.getGripLevel()}%</div>
+                        <div class="weather-condition">${weatherName}</div>
+                        <div class="weather-details">Grip: ${gripLevel}%</div>
                     </div>
                 </div>
                 
                 <div class="track-info">
-                    <div class="track-name">${this.trackData ? Object.keys(this.getTrackData(''))[0] : 'Track'}</div>
-                    <div class="track-length">${this.trackData.length} km • ${this.trackData.turns} turns</div>
+                    <div class="track-name">Bahrain International Circuit</div>
+                    <div class="track-length">5.412 km • 15 turns</div>
                 </div>
                 
                 <div id="car-markers"></div>
@@ -68,21 +61,13 @@ class TrackMapVisualizer {
     }
 
     generateTrackPath() {
-        if (!this.trackData) return '';
-
         const points = this.trackData.path;
         let path = `M ${points[0][0]} ${points[0][1]}`;
 
         for (let i = 1; i < points.length; i++) {
-            // Use quadratic curves for smooth track
-            const curr = points[i];
-            const prev = points[i - 1];
-            const cpx = (prev[0] + curr[0]) / 2;
-            const cpy = (prev[1] + curr[1]) / 2;
-            path += ` Q ${cpx} ${cpy} ${curr[0]} ${curr[1]}`;
+            path += ` L ${points[i][0]} ${points[i][1]}`;
         }
 
-        // Close the path
         path += ' Z';
         return path;
     }
@@ -103,14 +88,14 @@ class TrackMapVisualizer {
             carMarker.className = `car-marker ${carClass.toLowerCase()} ${position === 1 ? 'leading' : ''}`;
             carMarker.innerHTML = `
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L4 8v6l8 6 8-6V8l-8-6zm0 2.5L17.5 8 12 11.5 6.5 8 12 4.5z"/>
+                    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
                 </svg>
                 <div class="car-number">#${carNumber}</div>
             `;
             markersContainer.appendChild(carMarker);
         }
 
-        // Update position
+        // Update position smoothly
         carMarker.style.left = `${pos.x}%`;
         carMarker.style.top = `${pos.y}%`;
         carMarker.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
@@ -129,7 +114,6 @@ class TrackMapVisualizer {
         const x = current[0] + (next[0] - current[0]) * t;
         const y = current[1] + (next[1] - current[1]) * t;
 
-        // Calculate rotation
         const dx = next[0] - current[0];
         const dy = next[1] - current[1];
         const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -139,7 +123,17 @@ class TrackMapVisualizer {
 
     setWeather(condition) {
         this.weather = condition;
-        this.render();
+        // Update only weather overlay, not entire map
+        const weatherOverlay = this.container.querySelector('.weather-overlay');
+        if (weatherOverlay) {
+            weatherOverlay.innerHTML = `
+                <div class="weather-icon">${this.getWeatherIcon()}</div>
+                <div class="weather-info">
+                    <div class="weather-condition">${this.getWeatherName()}</div>
+                    <div class="weather-details">Grip: ${this.getGripLevel()}%</div>
+                </div>
+            `;
+        }
     }
 
     getWeatherIcon() {
@@ -176,54 +170,51 @@ class TrackMapVisualizer {
     }
 
     startUpdates() {
-        // Update car positions more frequently for smooth animation
-        this.updateInterval = setInterval(() => {
-            this.fetchCarPositions();
-        }, 500); // Update every 500ms for smooth movement
+        // Animate cars continuously
+        const animate = () => {
+            this.updateDemoCars();
+            this.animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
     }
 
-    async fetchCarPositions() {
-        try {
-            const response = await fetch('/api/leaderboard');
-            const data = await response.json();
+    updateDemoCars() {
+        // Demo cars with smooth movement
+        const demoCars = [
+            { number: 7, class: 'hypercar', speed: 1.0 },
+            { number: 8, class: 'hypercar', speed: 0.95 },
+            { number: 23, class: 'lmp2', speed: 0.9 },
+            { number: 38, class: 'lmp2', speed: 0.85 },
+            { number: 51, class: 'lmgt3', speed: 0.8 },
+            { number: 85, class: 'lmgt3', speed: 0.75 }
+        ];
 
-            data.forEach((car, index) => {
-                // Calculate lap progress (0.0 to 1.0)
-                const lapProgress = (car.current_lap % 1);
-                this.updateCarPosition(
-                    car.car_number,
-                    lapProgress,
-                    car.car_class,
-                    index + 1
-                );
-            });
-        } catch (error) {
-            console.error('Failed to fetch car positions:', error);
-        }
+        const time = Date.now() / 20000; // 20 second lap
+
+        demoCars.forEach((car, index) => {
+            const lapProgress = (time * car.speed) % 1;
+            this.updateCarPosition(
+                car.number,
+                lapProgress,
+                car.class,
+                index + 1
+            );
+        });
     }
 
     destroy() {
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
         }
     }
 }
 
-// Initialize track map when page loads
+// Initialize track map
 let trackMap;
 
 function initializeTrackMap() {
     trackMap = new TrackMapVisualizer('trackMap');
     trackMap.initialize('Bahrain International Circuit');
-
-    // Simulate weather changes (for demo)
-    const weatherConditions = ['clear', 'cloudy', 'light_rain', 'night'];
-    let weatherIndex = 0;
-
-    setInterval(() => {
-        weatherIndex = (weatherIndex + 1) % weatherConditions.length;
-        trackMap.setWeather(weatherConditions[weatherIndex]);
-    }, 60000); // Change weather every minute
 }
 
 // Add to existing initialization
@@ -232,3 +223,17 @@ if (document.readyState === 'loading') {
 } else {
     initializeTrackMap();
 }
+
+// Weather cycle for demo
+let weatherIndex = 0;
+const weatherConditions = ['clear', 'cloudy', 'light_rain', 'heavy_rain', 'night'];
+
+function cycleWeather() {
+    if (trackMap) {
+        weatherIndex = (weatherIndex + 1) % weatherConditions.length;
+        trackMap.setWeather(weatherConditions[weatherIndex]);
+    }
+}
+
+// Auto-cycle weather every 30 seconds
+setInterval(cycleWeather, 30000);
