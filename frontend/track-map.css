@@ -1,0 +1,199 @@
+/* Track Map Visualization Styles */
+
+.track-map-panel {
+    grid-column: 1 / -1;
+    background: rgba(15, 20, 35, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.track-map-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: radial-gradient(circle at center, rgba(10, 14, 26, 0.8), rgba(5, 7, 13, 0.95));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.track-path {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.track-path svg {
+    width: 100%;
+    height: 100%;
+}
+
+.track-outline {
+    fill: none;
+    stroke: rgba(100, 120, 150, 0.3);
+    stroke-width: 20;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.track-center-line {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 2;
+    stroke-dasharray: 10, 10;
+}
+
+.sector-marker {
+    fill: rgba(0, 212, 255, 0.2);
+    stroke: rgba(0, 212, 255, 0.5);
+    stroke-width: 2;
+}
+
+.car-marker {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    transform-origin: center;
+    transition: all 0.3s ease-out;
+    filter: drop-shadow(0 0 8px currentColor);
+    z-index: 10;
+}
+
+.car-marker.hypercar {
+    color: #ff3366;
+}
+
+.car-marker.lmp2 {
+    color: #00d4ff;
+}
+
+.car-marker.lmgt3 {
+    color: #ffaa00;
+}
+
+.car-marker svg {
+    width: 100%;
+    height: 100%;
+}
+
+.car-number {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.weather-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.weather-icon {
+    font-size: 24px;
+}
+
+.weather-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.weather-condition {
+    font-size: 12px;
+    color: #00d4ff;
+    font-weight: 600;
+}
+
+.weather-details {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.track-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.track-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.track-length {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Animation for car movement */
+@keyframes car-pulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 15px currentColor);
+    }
+}
+
+.car-marker.leading {
+    animation: car-pulse 2s infinite;
+}
+
+/* Minimap toggle */
+.minimap-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.3s ease;
+}
+
+.minimap-toggle:hover {
+    background: rgba(0, 212, 255, 0.3);
+    border-color: rgba(0, 212, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .track-map-container {
+        height: 300px;
+    }
+
+    .car-marker {
+        width: 18px;
+        height: 18px;
+    }
+}

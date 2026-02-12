@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Endurance Racing Tracker</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/track-map.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
@@ -50,6 +51,17 @@
                 <button class="filter-btn" data-class="LMGT3">LMGT3</button>
             </div>
         </header>
+
+        <!-- Track Map Visualization -->
+        <section class="panel track-map-panel">
+            <div class="panel-header">
+                <h2>🗺️ Live Track Map</h2>
+                <button class="minimap-toggle" onclick="trackMap.setWeather('light_rain')">
+                    Change Weather
+                </button>
+            </div>
+            <div id="trackMap"></div>
+        </section>
 
         <!-- Main Dashboard Grid -->
         <div class="dashboard-grid">
@@ -125,6 +137,7 @@
     </div>
 
     <script src="/static/app.js"></script>
+    <script src="/static/track-map.js"></script>
 </body>
 
 </html>
